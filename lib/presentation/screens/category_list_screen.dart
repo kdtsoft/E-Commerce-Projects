@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../state_holders/bottom_nav_bar_controller.dart';
+import '../state_holders/category_list_controller.dart';
+import '../widgets/centred_circular_progress_indicator.dart';
 
 class CategoryListScreen extends StatefulWidget {
   const CategoryListScreen({super.key});
@@ -21,26 +23,39 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Category"),
+          title: const Text('Category list'),
           leading: IconButton(
             onPressed: () {
               Get.find<MainBottomNavBarController>().backToHome();
             },
             icon: const Icon(Icons.arrow_back_ios_sharp),
-          ),),
-        body: GridView.builder(
-          itemCount: 15,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            childAspectRatio: 0.75,
-          ),
-          itemBuilder: (context, index) => const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: FittedBox(
-              child: CategoryItem(),
-            ),
           ),
         ),
+        body: GetBuilder<CategoryListController>(
+            builder: (categoryListController) {
+              if (categoryListController.inProgress) {
+                return const CenteredCircularProgressIndicator();
+              }
+
+              return RefreshIndicator(
+                onRefresh: categoryListController.getCategoryList,
+                child: GridView.builder(
+                  itemCount: categoryListController.categoryList.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    childAspectRatio: 0.72,
+                  ),
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CategoryItem(
+                        category: categoryListController.categoryList[index],
+                      ),
+                    );
+                  },
+                ),
+              );
+            }),
       ),
     );
   }

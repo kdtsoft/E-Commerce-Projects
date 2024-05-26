@@ -1,11 +1,11 @@
-import 'package:crafty_bay/presentation/widgets/product_card.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../state_holders/bottom_nav_bar_controller.dart';
 
 class WishListScreen extends StatefulWidget {
-  const WishListScreen({super.key,});
+  const WishListScreen({super.key});
 
   @override
   State<WishListScreen> createState() => _WishListScreenState();
@@ -21,7 +21,7 @@ class _WishListScreenState extends State<WishListScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Cards"),
+          title: const Text('Wishlist'),
           leading: IconButton(
             onPressed: () {
               Get.find<MainBottomNavBarController>().backToHome();
@@ -29,19 +29,22 @@ class _WishListScreenState extends State<WishListScreen> {
             icon: const Icon(Icons.arrow_back_ios_sharp),
           ),
         ),
-
         body: GridView.builder(
-          itemCount: 15,
+          itemCount: 25,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             childAspectRatio: 0.8,
           ),
-          itemBuilder: (context, index) => const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-            child: FittedBox(
-              child: ProductCard(showAddToWishlist: false,),
-            ),
-          ),
+          itemBuilder: (context, index) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              child: FittedBox(
+                // child: ProductCard(
+                //   showAddToWishlist: false,
+                // ),
+              ),
+            );
+          },
         ),
       ),
     );

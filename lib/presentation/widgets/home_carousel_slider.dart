@@ -1,14 +1,21 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:crafty_bay/data/models/slider_data.dart';
+import 'package:crafty_bay/presentation/utility/app_colors.dart';
+import 'package:crafty_bay/presentation/widgets/network_image_widget.dart';
 import 'package:flutter/material.dart';
-import '../utility/app_colors.dart';
+
 class HomeCarouselSlider extends StatefulWidget {
   const HomeCarouselSlider({
     super.key,
+    required this.sliderList,
   });
+
+  final List<SliderData> sliderList;
 
   @override
   State<HomeCarouselSlider> createState() => _HomeCarouselSliderState();
 }
+
 class _HomeCarouselSliderState extends State<HomeCarouselSlider> {
   final ValueNotifier<int> _selectedPageIndex = ValueNotifier(0);
 
@@ -25,53 +32,116 @@ class _HomeCarouselSliderState extends State<HomeCarouselSlider> {
 
   Widget _buildCarouselSlider() {
     return CarouselSlider(
-        options: CarouselOptions(height: 200, viewportFraction: 1, onPageChanged: (index,_){
-          _selectedPageIndex.value = index;
-        }),
-        items: [1, 2, 3, 4, 5].map((i) {
-          return Builder(
-            builder: (BuildContext context) {
-              return Container(
-                  width: MediaQuery.of(context).size.width,
-                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor,
-                    borderRadius: BorderRadius.circular(8),
+      options: CarouselOptions(
+          height: 250,
+          viewportFraction: 1,
+          onPageChanged: (index, _) {
+            _selectedPageIndex.value = index;
+          }),
+      items: widget.sliderList.map((slider) {
+        return Builder(
+          builder: (BuildContext context) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.symmetric(horizontal: 5.0),
+              decoration: BoxDecoration(
+                  color: AppColors.primaryColor,
+                  borderRadius: BorderRadius.circular(8)),
+              alignment: Alignment.center,
+              child: Stack(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: NetworkImageWidget(
+                        url: slider.image ?? '',
+                        height: double.maxFinite,
+                        widget: double.maxFinite,
+                        boxFit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'text $i',
-                    style: const TextStyle(fontSize: 16.0),
-                  ));
-            },
-          );
-        }).toList(),
-      );
+                  Expanded(
+                    flex: 2,
+                    child: _buildProductDescription(slider),
+                  )
+                ],
+              ),
+            );
+          },
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildProductDescription(SliderData slider) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            slider.title ?? '',
+            style: const TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Text(
+            slider.shortDes ?? '',
+            maxLines: 3,
+            style: const TextStyle(
+                color: Colors.black, overflow: TextOverflow.ellipsis),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: 100,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: AppColors.primaryColor,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {},
+              child: const Text('Buy now'),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   Widget _buildDotIndicator() {
     return ValueListenableBuilder(
-        valueListenable: _selectedPageIndex,
-        builder: (BuildContext context, int currentPage, _) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (int i = 0; i < 5; i++)
-                Container(
-                  height: 20,
-                  width: 20,
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  decoration: BoxDecoration(
-                    color: i == currentPage? AppColors.primaryColor : null,
-                    border: Border.all(color: i == currentPage? AppColors.primaryColor : Colors.grey, width: 1),
-                    // color: AppColors.primaryColor,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                )
-            ],
-          );
-        },
-
-      );
+      valueListenable: _selectedPageIndex,
+      builder: (context, currentPage, _) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (int i = 0; i < widget.sliderList.length; i++)
+              Container(
+                width: 15,
+                height: 15,
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                decoration: BoxDecoration(
+                  color: i == currentPage ? AppColors.primaryColor : null,
+                  border: Border.all(
+                      color: i == currentPage
+                          ? AppColors.primaryColor
+                          : Colors.grey,
+                      width: 1),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+              )
+          ],
+        );
+      },
+    );
   }
 }
